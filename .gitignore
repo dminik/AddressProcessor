@@ -1,32 +1,73 @@
-# Object files
-*.o
-*.ko
+
+*.ncrunchproject
 *.obj
-*.elf
-
-# Precompiled Headers
-*.gch
+*.pdb
+*.aps
 *.pch
+*.vspscc
+*.vssscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
 
-# Libraries
+*.cache
+*.ilk
+*.log
 *.lib
-*.a
-*.la
-*.lo
+*.sbr
+*.scc
+*.tmp
 
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
+[Dd]ebug*/
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+[Bb]in
+*/bin/*
 
-# Debug files
-*.dSYM/
+
+
+*/obj/*
+[Rr]elease*/
+_ReSharper*/
+_ReSharper*
+_ReSharper.voda/
+_ReSharper.XLN
+[Tt]humbs.db
+[Tt]est[Rr]esult*
+[Bb]uild[Ll]og.*
+*.[Pp]ublish.xml
+*.resharper
+*.ReSharper
+packages/
+
+
+#ignore    StyleCope cache
+#StyleCop.Cache
+[Ss]tyle[Cc]op.[Cc]ache
+
+#ignore merc merge temp files
+*.orig
+
+# ignore temp directories
+[Tt]emp/
+[Tt]mp/
+
+#winword temp files
+~$*.docx
+
+
+
+
+
+
+*.psd
+*.tif
+
+\obj*
+*\App_Data\*
+ContosoUniversity/App_Data/CU10_log.ldf
+ContosoUniversity/App_Data/CU10.mdf
+*/App_Data/*
+WebAPI/Images/Books/*
