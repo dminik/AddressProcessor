@@ -28,3 +28,12 @@ Your task:
        This edition and other options are available to download from: http://www.visualstudio.com/downloads/
 
 Visual Studio 2013 Solution file: .\src\Exercise.sln
+
+
+
+
+MY:
+Several projects to reuse
+Bulk insert
+Add AddressRecord
+Build solution with .sln
