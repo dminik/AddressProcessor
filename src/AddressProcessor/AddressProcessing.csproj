@@ -60,6 +60,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Address\v1\IMailShot.cs" />
     <Compile Include="Address\v2\IMailShot.cs" />
+    <Compile Include="Exceptions\WrongFieldsNumberException.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataProviders\DataProviders.csproj">
+      <Project>{C4B8891C-31B1-4D99-B0CA-1059B81651A0}</Project>
+      <Name>DataProviders</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Helpers.Common\Helpers.Common.csproj">
+      <Project>{50EB6675-6843-4918-BD53-42282CFA0156}</Project>
+      <Name>Helpers.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

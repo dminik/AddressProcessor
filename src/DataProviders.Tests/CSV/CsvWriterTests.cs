@@ -10,21 +10,16 @@ namespace DataProviders.Tests.CSV
 {
 	[TestFixture]
 	public class CsvWriterTests
-	{
-		string fileName = @"..\..\SampleData\write.txt";
-		const string DELIMETER_AS_SPACE = " ";
-		const string DELIMETER_AS_SEMICOLON = ";";
-
-		[SetUp]
-		public void Setup()
-		{
-			fileName = Path.Combine(ConfigurationManager.AppSettings.Get("sampleDataPath"), "quotesUTF8.txt");
-		}
-
+	{		
+		const char DELIMETER_AS_SPACE = ' ';
+		const char DELIMETER_AS_SEMICOLON = ';';
+		
 		[Test]
 		public void Write_RealFile_Success()
 		{
 			// Arrange
+			var fileName = Path.Combine(ConfigurationManager.AppSettings.Get("sampleDataPath"), "quotesUTF8.txt");
+
 			if (File.Exists(fileName))
 				File.Delete(fileName);
 
@@ -57,6 +52,8 @@ namespace DataProviders.Tests.CSV
 		public void Write_RealFileUTF8_Success()
 		{
 			// Arrange
+			var fileName = Path.Combine(ConfigurationManager.AppSettings.Get("sampleDataPath"), "quotesUTF8.txt");
+
 			if (File.Exists(fileName))
 				File.Delete(fileName);
 

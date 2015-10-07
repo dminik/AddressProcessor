@@ -2,6 +2,8 @@
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Text;
+
 using DataProviders.CSV;
 using Helpers.Common;
 using NUnit.Framework;
@@ -11,13 +13,15 @@ namespace DataProviders.Tests.CSV
 	[TestFixture]
 	public class CsvReaderTests
 	{
+		private readonly string _pathToTestDir = ConfigurationManager.AppSettings.Get("sampleDataPath");
+
 		const char DELIMETER_AS_SPACE = ' ';
 
 		[Test]
 		public void Read_RealFile_Success()
 		{
 			// Arrange
-			var filePath = Path.Combine(ConfigurationManager.AppSettings.Get("sampleDataPath"), "quotes.txt");
+			var filePath = Path.Combine(_pathToTestDir, "quotes.txt");
 			using (var reader = new CsvReader(filePath))
 			{
 				var lineCounter = 0;
@@ -36,8 +40,17 @@ namespace DataProviders.Tests.CSV
 		public void Read_RealFileUTF8_Success()
 		{
 			// Arrange
-			var filePath = Path.Combine(ConfigurationManager.AppSettings.Get("sampleDataPath"), "quotesUTF8.txt");
-			using (var reader = new CsvReader(filePath))
+			var filePath = Path.Combine(_pathToTestDir, "quotesUTF8.txt");
+			
+			if (File.Exists(filePath))
+				File.Delete(filePath);
+
+			using (var sw = new StreamWriter(File.Open(filePath, FileMode.Create), Encoding.UTF8))
+			{
+				sw.WriteLine("è €\nè2 €2");
+			}
+
+			using (var reader = new CsvReader(filePath, DELIMETER_AS_SPACE))
 			{
 				// Act
 				var values = reader.Read();
@@ -57,6 +70,9 @@ namespace DataProviders.Tests.CSV
 				Assert.AreEqual("è2", values[0]);
 				Assert.AreEqual("€2", values[1]);
 			}
+
+			if (File.Exists(filePath))
+				File.Delete(filePath);
 		}
 
 		[Test]

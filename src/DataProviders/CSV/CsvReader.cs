@@ -12,6 +12,8 @@ namespace DataProviders.CSV
 		private bool _disposed;
 		private readonly char _delimiter;
 
+		public uint ProcessedLines { get; private set; }
+
 		public CsvReader(string fileName, char delimiter = '\t', Encoding encoding = null)
 		{
 			fileName.ThrowIfNull("fileName");
@@ -46,6 +48,7 @@ namespace DataProviders.CSV
 				if (line != null)
 					values = line.Split(_delimiter);
 
+				ProcessedLines++;
 				return values;
 			}
 

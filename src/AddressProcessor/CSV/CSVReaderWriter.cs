@@ -1,137 +1,153 @@
 ﻿using System;
 using System.IO;
 
+using AddressProcessing.Exceptions;
+
+using DataProviders;
+using DataProviders.CSV;
+
+using Helpers.Common;
+
 namespace AddressProcessing.CSV
 {
-    public class CSVReaderWriter
-    {
-        private StreamReader _readerStream = null;
-        private StreamWriter _writerStream = null;
+	/// <summary>
+	/// Предположим, что класс используется в продакшине как ридер и врайтер одновременно. Может иметь 2 открытых потока.
+	/// Может открывать новые потоки, закрывая старые. 
+	/// CSVReaderWriter will close any passed or created streams while disposing.
+	/// </summary>
+	public class CSVReaderWriter : IDisposable
+	{
+		IReader _readerStream = null;
+		IWriter _writerStream = null;
 
-        [Flags]
-        public enum Mode { Read = 1, Write = 2 };
+		readonly char DELIMETER_AS_TAB = '\t';
+		const int FIRST_COLUMN = 0;
+		const int SECOND_COLUMN = 1;
+		const int MIN_COLUMN_COUNT = 2;
+		
+		[Flags]
+		public enum Mode { Read = 1, Write = 2 };
 
-        public void Open(string fileName, Mode mode)
-        {
-            if (mode == Mode.Read)
-            {
-                _readerStream = File.OpenText(fileName);
-            }
-            else if (mode == Mode.Write)
-            {
-                FileInfo fileInfo = new FileInfo(fileName);
-                _writerStream = fileInfo.CreateText();
-            }
-            else
-            {
-                throw new Exception("Unknown file mode for " + fileName);
-            }
-        }
+		[Obsolete("This constructor is obsolete.  with parameters in 'using()'")]
+		public CSVReaderWriter()
+		{			
+		}
 
-        public void Write(params string[] columns)
-        {
-            string outPut = "";
+		public CSVReaderWriter(string fileName, Mode mode)
+		{
+#pragma warning disable 618
+			Open(fileName, mode);
+#pragma warning restore 618
+		}
 
-            for (int i = 0; i < columns.Length; i++)
-            {
-                outPut += columns[i];
-                if ((columns.Length - 1) != i)
-                {
-                    outPut += "\t";
-                }
-            }
+		public CSVReaderWriter(IReader readerStream)
+		{
+			_readerStream = readerStream;
+		}
 
-            WriteLine(outPut);
-        }
+		public CSVReaderWriter(IWriter writerStream)
+		{
+			_writerStream = writerStream;
+		}
+		
+		[Obsolete("This method is obsolete. Use constructors with parameters in 'using()' instead")]
+		public void Open(string fileName, Mode mode)
+		{			
+			fileName.ThrowIfNull("fileName");
+			
+			switch (mode)
+			{
+				case Mode.Read:
+				{
+					if (_readerStream != null) 
+						_readerStream.Close();
 
-        public bool Read(string column1, string column2)
-        {
-            const int FIRST_COLUMN = 0;
-            const int SECOND_COLUMN = 1;
+					_readerStream = new CsvReader(new StreamReader(fileName), DELIMETER_AS_TAB);
+					break;
+				}
+				case Mode.Write:
+				{
+					if (_writerStream != null)
+						_writerStream.Close();
 
-            string line;
-            string[] columns;
+					_writerStream = new CsvWriter(new StreamWriter(fileName), DELIMETER_AS_TAB);
+					break;
+				}
+				default:
+					throw new Exception(String.Format("Unknown mode {0}", mode));
+			}
+		}
 
-            char[] separator = { '\t' };
+		public void Write(params string[] columns)
+		{
+			columns.ThrowIfNull("columns");
 
-            line = ReadLine();
-            columns = line.Split(separator);
+			if(_writerStream == null)
+				throw new NullReferenceException("_writerStream == null");
 
-            if (columns.Length == 0)
-            {
-                column1 = null;
-                column2 = null;
+			_writerStream.Write(columns);
+		}
 
-                return false;
-            }
-            else
-            {
-                column1 = columns[FIRST_COLUMN];
-                column2 = columns[SECOND_COLUMN];
+		[Obsolete("This method is obsolete. Use 'bool Read(out string[] columns)' instead")]
+		public bool Read(string reservedParam1 = null, string reservedParam2 = null)
+		{			
+			var columns = _readerStream.Read();			
+			return columns.Length == 0;
+		}
 
-                return true;
-            }
-        }
+		[Obsolete("This method is obsolete. Use 'bool Read(out string[] columns)' instead")]
+		public bool Read(out string column1, out string column2)
+		{
+			string[] columns;
+			var isReadSuccess = this.Read(out columns);
+						
+			if (!isReadSuccess)  
+			{
+				column1 = null;
+				column2 = null;
+			}			
+			else
+			{
+				column1 = columns[FIRST_COLUMN];
+				column2 = columns[SECOND_COLUMN];
+			}
 
-        public bool Read(out string column1, out string column2)
-        {
-            const int FIRST_COLUMN = 0;
-            const int SECOND_COLUMN = 1;
+			return isReadSuccess;
+		}
 
-            string line;
-            string[] columns;
+		public bool Read(out string[] columns)
+		{			
+			bool isReadSuccess;
 
-            char[] separator = { '\t' };
+			columns = _readerStream.Read();
 
-            line = ReadLine();
+			var isEOF = columns == null;
+			var isEmptyLine = columns == null || columns.Length == 0;
 
-            if (line == null)
-            {
-                column1 = null;
-                column2 = null;
+			if (isEOF || isEmptyLine)						
+				isReadSuccess = false;			
+			else if (columns.Length < MIN_COLUMN_COUNT)
+			{
+				throw new WrongFieldsNumberException(_readerStream.ProcessedLines, MIN_COLUMN_COUNT, (uint)columns.Length);
+			}
+			else			
+				isReadSuccess = true;
+			
+			return isReadSuccess;
+		}
+		
+		public void Close()
+		{
+			if (_writerStream != null)			
+				_writerStream.Close();			
 
-                return false;
-            }
+			if (_readerStream != null)			
+				_readerStream.Close();			
+		}
 
-            columns = line.Split(separator);
-
-            if (columns.Length == 0)
-            {
-                column1 = null;
-                column2 = null;
-
-                return false;
-            } 
-            else
-            {
-                column1 = columns[FIRST_COLUMN];
-                column2 = columns[SECOND_COLUMN];
-
-                return true;
-            }
-        }
-
-        private void WriteLine(string line)
-        {
-            _writerStream.WriteLine(line);
-        }
-
-        private string ReadLine()
-        {
-            return _readerStream.ReadLine();
-        }
-
-        public void Close()
-        {
-            if (_writerStream != null)
-            {
-                _writerStream.Close();
-            }
-
-            if (_readerStream != null)
-            {
-                _readerStream.Close();
-            }
-        }
-    }
+		public void Dispose()
+		{
+			Close();
+		}
+	}
 }

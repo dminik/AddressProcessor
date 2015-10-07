@@ -11,9 +11,9 @@ namespace DataProviders.CSV
 		private StreamWriter _writer;
 
 		private bool _disposed;
-		private readonly string _delimiter;
+		private readonly char _delimiter;
 
-		public CsvWriter(string fileName, string delimiter = "\t", bool append = true, Encoding encoding = null)
+		public CsvWriter(string fileName, char delimiter = '\t', bool append = true, Encoding encoding = null)
 		{
 			fileName.ThrowIfNull("fileName");
 
@@ -25,7 +25,7 @@ namespace DataProviders.CSV
 			_writer = new StreamWriter(fileName, append, encoding);
 		}
 
-		public CsvWriter(StreamWriter stream, string delimiter = "\t")
+		public CsvWriter(StreamWriter stream, char delimiter = '\t')
 		{
 			stream.ThrowIfNull("stream");
 			_delimiter = delimiter;
@@ -39,7 +39,7 @@ namespace DataProviders.CSV
 			if (_disposed)
 				throw new ObjectDisposedException(typeof(CsvWriter).FullName);
 
-			var line = string.Join(_delimiter, data);
+			var line = string.Join(_delimiter.ToString(), data);
 			_writer.WriteLine(line);
 		}
 
