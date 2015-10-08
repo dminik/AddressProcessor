@@ -14,13 +14,10 @@ namespace AddressProcessing.CSV
 	/// </summary>
 	public class CSVReaderWriter : ICSVReaderWriter
 	{
-		const char DELIMETER_AS_TAB = '\t';
-		const int FIRST_COLUMN = 0;
-		const int SECOND_COLUMN = 1;
+		const char DELIMETER_AS_TAB = '\t';		
 		const int MIN_COLUMN_COUNT = 2;
 
 		private IReader ReaderStream { get; set; }
-
 		private IWriter WriterStream { get; set; }
 
 		[Flags]
@@ -28,15 +25,11 @@ namespace AddressProcessing.CSV
 
 		[Obsolete("This constructor is obsolete. Use constructors with parameters in using()")]
 		public CSVReaderWriter()
-		{
-			WriterStream = null;
-			ReaderStream = null;
+		{			
 		}
 
 		public CSVReaderWriter(string fileName, Mode mode)
-		{
-			WriterStream = null;
-			ReaderStream = null;
+		{			
 			fileName.ThrowIfNullOrEmpty("fileName");
 
 #pragma warning disable 618 // Obsolete warning
@@ -123,6 +116,9 @@ namespace AddressProcessing.CSV
 			}			
 			else
 			{
+				const int FIRST_COLUMN = 0;
+				const int SECOND_COLUMN = 1;
+
 				column1 = columns[FIRST_COLUMN];
 				column2 = columns[SECOND_COLUMN];
 			}
