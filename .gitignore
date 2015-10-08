@@ -40,6 +40,7 @@ _ReSharper.XLN
 *.[Pp]ublish.xml
 *.resharper
 *.ReSharper
+*DotSettings.user
 packages/
 
 
