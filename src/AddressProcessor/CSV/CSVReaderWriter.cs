@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 using AddressProcessing.Exceptions;
 
@@ -15,7 +16,7 @@ namespace AddressProcessing.CSV
 	public class CSVReaderWriter : ICSVReaderWriter
 	{
 		const char DELIMETER_AS_TAB = '\t';		
-		const int MIN_COLUMN_COUNT = 2;
+		
 
 		private IReader ReaderStream { get; set; }
 		private IWriter WriterStream { get; set; }
@@ -28,13 +29,11 @@ namespace AddressProcessing.CSV
 		{			
 		}
 
-		public CSVReaderWriter(string fileName, Mode mode)
+		public CSVReaderWriter(string fileName, Mode mode, char delimiter = DELIMETER_AS_TAB, bool append = true, Encoding encoding = null)
 		{			
 			fileName.ThrowIfNullOrEmpty("fileName");
 
-#pragma warning disable 618 // Obsolete warning
-			Open(fileName, mode);
-#pragma warning restore 618
+			Open_Internal(fileName, mode, delimiter, append, encoding);
 		}
 
 		public CSVReaderWriter(IReader readerStream)
@@ -56,6 +55,11 @@ namespace AddressProcessing.CSV
 		[Obsolete("This method is obsolete. Use constructors with parameters in using() instead")]
 		public void Open(string fileName, Mode mode)
 		{
+			Open_Internal(fileName, mode, DELIMETER_AS_TAB, false, Encoding.UTF8);
+		}
+
+		protected void Open_Internal(string fileName, Mode mode, char delimiter, bool append, Encoding encoding)
+		{
 			fileName.ThrowIfNullOrEmpty("fileName");
 			
 			switch (mode)
@@ -65,7 +69,7 @@ namespace AddressProcessing.CSV
 					if (ReaderStream != null) 
 						ReaderStream.Close();
 
-					ReaderStream = new CsvReader(fileName, DELIMETER_AS_TAB);
+					ReaderStream = new CsvReader(fileName, delimiter, encoding);
 					break;
 				}
 				case Mode.Write:
@@ -73,7 +77,7 @@ namespace AddressProcessing.CSV
 					if (WriterStream != null)
 						WriterStream.Close();
 
-					WriterStream = new CsvWriter(fileName, DELIMETER_AS_TAB);
+					WriterStream = new CsvWriter(fileName, delimiter, append, encoding);
 					break;
 				}
 				default:
@@ -137,6 +141,8 @@ namespace AddressProcessing.CSV
 
 			var isEOF = columns == null;
 			var isEmptyLine = columns == null || columns.Length == 0;
+
+			const int MIN_COLUMN_COUNT = 2;
 
 			if (isEOF || isEmptyLine)						
 				isReadSuccess = false;			
