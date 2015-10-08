@@ -35,6 +35,8 @@ namespace AddressProcessing.CSV
 
 		public CSVReaderWriter(string fileName, Mode mode)
 		{
+			fileName.ThrowIfNull("fileName");
+
 #pragma warning disable 618 // Obsolete warning
 			Open(fileName, mode);
 #pragma warning restore 618
@@ -42,11 +44,15 @@ namespace AddressProcessing.CSV
 
 		public CSVReaderWriter(IReader readerStream)
 		{
+			readerStream.ThrowIfNull("readerStream");
+
 			_readerStream = readerStream;
 		}
 
 		public CSVReaderWriter(IWriter writerStream)
 		{
+			writerStream.ThrowIfNull("writerStream");
+
 			_writerStream = writerStream;
 		}
 		
@@ -82,15 +88,18 @@ namespace AddressProcessing.CSV
 		{
 			columns.ThrowIfNull("columns");
 
-			if(_writerStream == null)
-				throw new NullReferenceException("_writerStream == null");
-
+			if (_writerStream == null)
+				throw new NullReferenceException("_writerStream");
+			
 			_writerStream.Write(columns);
 		}
 
 		[Obsolete("This method is obsolete. Use 'bool Read(out string[] columns)' instead")]
 		public bool Read(string column1 = null, string column2 = null)
-		{			
+		{
+			if (_readerStream == null)
+				throw new NullReferenceException("_readerStream");
+			
 			var columns = _readerStream.Read();			
 			return columns.Length == 0;
 		}
@@ -116,7 +125,10 @@ namespace AddressProcessing.CSV
 		}
 
 		public bool Read(out string[] columns)
-		{			
+		{
+			if(_readerStream == null)
+				throw new NullReferenceException("_readerStream");
+
 			bool isReadSuccess;
 
 			columns = _readerStream.Read();
@@ -138,11 +150,17 @@ namespace AddressProcessing.CSV
 		
 		public void Close()
 		{
-			if (_writerStream != null)			
-				_writerStream.Close();			
+			if (_writerStream != null)
+			{
+				_writerStream.Close();
+				_writerStream = null;
+			}
 
-			if (_readerStream != null)			
-				_readerStream.Close();			
+			if (_readerStream != null)
+			{
+				_readerStream.Close();
+				_readerStream = null;
+			}			
 		}
 
 		public void Dispose()

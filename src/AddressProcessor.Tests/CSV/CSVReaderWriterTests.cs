@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using AddressProcessing.CSV;
 using AddressProcessing.Exceptions;
@@ -31,6 +32,44 @@ namespace AddressProcessing.Tests.CSV
 				string[] columns;
 				readerWriterUnderTest.Read(out columns);	
 			}			
+		}
+
+		[Test]
+		[ExpectedException(typeof(NullReferenceException), ExpectedMessage = "_readerStream")]
+		public void Read_ReadDisposed_ThrowException()
+		{
+			// Arrange	
+			var columnsInLines = new List<string[]>
+			{				 
+				new [] {"1", "2"},
+				new [] {"3", "4"},
+			};
+
+			var mockReader = CreateMockReader(columnsInLines);
+			using (var readerWriterUnderTest = new CSVReaderWriter(mockReader.Object))
+			{
+				// Act
+				string[] columns;
+				readerWriterUnderTest.Read(out columns);
+				readerWriterUnderTest.Dispose();
+				readerWriterUnderTest.Read(out columns);
+			}
+		}
+
+		[Test]
+		[ExpectedException(typeof(NullReferenceException), ExpectedMessage = "_writerStream")]
+		public void Write_WriteDisposed_ThrowException()
+		{
+			// Arrange				
+			var mockWriter = new Mock<IWriter>();
+			using (var readerWriterUnderTest = new CSVReaderWriter(mockWriter.Object))
+			{
+				// Act
+				string[] columns = { "1", "2" };
+				readerWriterUnderTest.Write(columns);
+				readerWriterUnderTest.Dispose();
+				readerWriterUnderTest.Write(columns);
+			}
 		}
 
 		/// <summary>
