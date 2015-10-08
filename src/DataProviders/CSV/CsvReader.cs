@@ -8,9 +8,11 @@ namespace DataProviders.CSV
 {
 	public class CsvReader : IReader
 	{
-		private StreamReader _reader;
-		private bool _disposed;
-		private readonly char _delimiter;
+		protected StreamReader Reader { get; set; }
+
+		public bool IsDisposed { get; private set; }
+
+		public char Delimiter { get; private set; }
 
 		public uint ProcessedLines { get; private set; }
 
@@ -18,35 +20,35 @@ namespace DataProviders.CSV
 		{
 			fileName.ThrowIfNull("fileName");
 
-			_delimiter = delimiter;
+			Delimiter = delimiter;
 
 			if (encoding == null)
 				encoding = Encoding.UTF8;
 
-			_reader = new StreamReader(fileName, encoding);
+			Reader = new StreamReader(fileName, encoding);
 		}
 
 		public CsvReader(StreamReader stream, char delimiter = '\t')
 		{
 			stream.ThrowIfNull("stream");
 
-			_delimiter = delimiter;
-			_reader = stream;
+			Delimiter = delimiter;
+			Reader = stream;
 		}
 
-		public string[] Read()
+		public virtual string[] Read()
 		{
-			if (_disposed)
+			if (IsDisposed)
 				throw new ObjectDisposedException(typeof(CsvReader).FullName);
 
 			var values = new string[0];
 
-			if (_reader.Peek() > -1)
+			if (Reader.Peek() > -1)
 			{
-				var line = _reader.ReadLine();
+				var line = Reader.ReadLine();
 
 				if (line != null)
-					values = line.Split(_delimiter);
+					values = line.Split(Delimiter);
 
 				ProcessedLines++;
 				return values;
@@ -55,12 +57,12 @@ namespace DataProviders.CSV
 			return null;
 		}
 
-		public void Close()
+		public virtual void Close()
 		{
 			Dispose();
 		}
 
-		public void Dispose()
+		public virtual void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
@@ -68,18 +70,18 @@ namespace DataProviders.CSV
 
 		protected virtual void Dispose(bool disposing)
 		{
-			if (!_disposed)
+			if (!IsDisposed)
 			{
 				if (disposing)
 				{
-					if (_reader != null)
+					if (Reader != null)
 					{
-						_reader.Close();
-						_reader = null;
+						Reader.Close();
+						Reader = null;
 					}
 				}
 
-				_disposed = true;
+				IsDisposed = true;
 			}
 		}
 	}

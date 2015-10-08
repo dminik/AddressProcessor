@@ -9,31 +9,34 @@ using Helpers.Common;
 
 namespace AddressProcessing.CSV
 {
-	/// <summary>
-	/// Предположим, что класс используется в продакшине как ридер и врайтер одновременно. Может иметь 2 открытых потока.
-	/// Может открывать новые потоки, закрывая старые. 
-	/// CSVReaderWriter will close any passed or created streams while disposing.
+	/// <summary>	
+	/// CSVReaderWriter will close any passed or opened streams while disposing.
 	/// </summary>
 	public class CSVReaderWriter : ICSVReaderWriter
 	{
-		IReader _readerStream = null;
-		IWriter _writerStream = null;
-
-		readonly char DELIMETER_AS_TAB = '\t';
+		const char DELIMETER_AS_TAB = '\t';
 		const int FIRST_COLUMN = 0;
 		const int SECOND_COLUMN = 1;
 		const int MIN_COLUMN_COUNT = 2;
-		
+
+		private IReader ReaderStream { get; set; }
+
+		private IWriter WriterStream { get; set; }
+
 		[Flags]
 		public enum Mode { Read = 1, Write = 2 };
 
 		[Obsolete("This constructor is obsolete. Use constructors with parameters in using()")]
 		public CSVReaderWriter()
-		{			
+		{
+			WriterStream = null;
+			ReaderStream = null;
 		}
 
 		public CSVReaderWriter(string fileName, Mode mode)
 		{
+			WriterStream = null;
+			ReaderStream = null;
 			fileName.ThrowIfNullOrEmpty("fileName");
 
 #pragma warning disable 618 // Obsolete warning
@@ -43,16 +46,18 @@ namespace AddressProcessing.CSV
 
 		public CSVReaderWriter(IReader readerStream)
 		{
+			WriterStream = null;
 			readerStream.ThrowIfNull("readerStream");
 
-			_readerStream = readerStream;
+			ReaderStream = readerStream;
 		}
 
 		public CSVReaderWriter(IWriter writerStream)
 		{
+			ReaderStream = null;
 			writerStream.ThrowIfNull("writerStream");
 
-			_writerStream = writerStream;
+			WriterStream = writerStream;
 		}
 		
 		[Obsolete("This method is obsolete. Use constructors with parameters in using() instead")]
@@ -64,18 +69,18 @@ namespace AddressProcessing.CSV
 			{
 				case Mode.Read:
 				{
-					if (_readerStream != null) 
-						_readerStream.Close();
+					if (ReaderStream != null) 
+						ReaderStream.Close();
 
-					_readerStream = new CsvReader(fileName, DELIMETER_AS_TAB);
+					ReaderStream = new CsvReader(fileName, DELIMETER_AS_TAB);
 					break;
 				}
 				case Mode.Write:
 				{
-					if (_writerStream != null)
-						_writerStream.Close();
+					if (WriterStream != null)
+						WriterStream.Close();
 
-					_writerStream = new CsvWriter(fileName, DELIMETER_AS_TAB);
+					WriterStream = new CsvWriter(fileName, DELIMETER_AS_TAB);
 					break;
 				}
 				default:
@@ -87,19 +92,19 @@ namespace AddressProcessing.CSV
 		{
 			columns.ThrowIfNull("columns");
 
-			if (_writerStream == null)
+			if (WriterStream == null)
 				throw new NullReferenceException("_writerStream");
 			
-			_writerStream.Write(columns);
+			WriterStream.Write(columns);
 		}
 
 		[Obsolete("This method is obsolete. Use 'bool Read(out string[] columns)' instead")]
 		public bool Read(string column1, string column2)
 		{
-			if (_readerStream == null)
+			if (ReaderStream == null)
 				throw new NullReferenceException("_readerStream");
 			
-			var columns = _readerStream.Read();
+			var columns = ReaderStream.Read();
 
 			var isReadFailed = columns == null || columns.Length == 0;
 			return !isReadFailed;
@@ -127,12 +132,12 @@ namespace AddressProcessing.CSV
 
 		public bool Read(out string[] columns)
 		{
-			if(_readerStream == null)
+			if(ReaderStream == null)
 				throw new NullReferenceException("_readerStream");
 
 			bool isReadSuccess;
 
-			columns = _readerStream.Read();
+			columns = ReaderStream.Read();
 
 			var isEOF = columns == null;
 			var isEmptyLine = columns == null || columns.Length == 0;
@@ -141,7 +146,7 @@ namespace AddressProcessing.CSV
 				isReadSuccess = false;			
 			else if (columns.Length < MIN_COLUMN_COUNT)
 			{
-				throw new WrongFieldsNumberException(_readerStream.ProcessedLines, MIN_COLUMN_COUNT, (uint)columns.Length);
+				throw new WrongFieldsNumberException(ReaderStream.ProcessedLines, MIN_COLUMN_COUNT, (uint)columns.Length);
 			}
 			else			
 				isReadSuccess = true;
@@ -151,16 +156,16 @@ namespace AddressProcessing.CSV
 		
 		public void Close()
 		{
-			if (_writerStream != null)
+			if (WriterStream != null)
 			{
-				_writerStream.Close();
-				_writerStream = null;
+				WriterStream.Close();
+				WriterStream = null;
 			}
 
-			if (_readerStream != null)
+			if (ReaderStream != null)
 			{
-				_readerStream.Close();
-				_readerStream = null;
+				ReaderStream.Close();
+				ReaderStream = null;
 			}			
 		}
 

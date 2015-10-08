@@ -8,47 +8,48 @@ namespace DataProviders.CSV
 {
 	public class CsvWriter : IWriter
 	{
-		private StreamWriter _writer;
+		protected StreamWriter Writer { get; set; }
 
-		private bool _disposed;
-		private readonly char _delimiter;
+		public bool IsDisposed { get; private set; }
+
+		public char Delimiter { get; private set; }
 
 		public CsvWriter(string fileName, char delimiter = '\t', bool append = true, Encoding encoding = null)
 		{
 			fileName.ThrowIfNull("fileName");
 
-			_delimiter = delimiter;
+			Delimiter = delimiter;
 
 			if (encoding == null)
 				encoding = Encoding.UTF8;
 
-			_writer = new StreamWriter(fileName, append, encoding);
+			Writer = new StreamWriter(fileName, append, encoding);
 		}
 
 		public CsvWriter(StreamWriter stream, char delimiter = '\t')
 		{
 			stream.ThrowIfNull("stream");
-			_delimiter = delimiter;
-			_writer = stream;
+			Delimiter = delimiter;
+			Writer = stream;
 		}
 
-		public void Write(string[] data)
+		public virtual void Write(string[] data)
 		{
 			data.ThrowIfNull("data");
 
-			if (_disposed)
+			if (IsDisposed)
 				throw new ObjectDisposedException(typeof(CsvWriter).FullName);
 
-			var line = string.Join(_delimiter.ToString(), data);
-			_writer.WriteLine(line);
+			var line = string.Join(Delimiter.ToString(), data);
+			Writer.WriteLine(line);
 		}
 
-		public void Close()
+		public virtual void Close()
 		{
 			Dispose();
 		}
 
-		public void Dispose()
+		public virtual void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
@@ -56,18 +57,18 @@ namespace DataProviders.CSV
 
 		protected virtual void Dispose(bool disposing)
 		{
-			if (!_disposed)
+			if (!IsDisposed)
 			{
 				if (disposing)
 				{
-					if (_writer != null)
+					if (Writer != null)
 					{
-						_writer.Close();
-						_writer = null;
+						Writer.Close();
+						Writer = null;
 					}
 				}
 
-				_disposed = true;
+				IsDisposed = true;
 			}
 		}
 	}
