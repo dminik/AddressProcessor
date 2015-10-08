@@ -13,6 +13,16 @@ namespace Helpers.Common
 			return argument;
 		}
 
+		public static string ThrowIfNullOrEmpty(this string argument, string argumentName = "")
+		{
+			if (argument == null)
+				throw new ArgumentNullException(argumentName);
+			if (argument == string.Empty)
+				throw new ArgumentException(argumentName);
+
+			return argument;
+		}
+
 		public static StreamReader ToStream(this string s)
 		{
 			var stream = new MemoryStream();

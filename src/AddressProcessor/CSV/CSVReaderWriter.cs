@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 using AddressProcessing.Exceptions;
 
@@ -28,14 +27,14 @@ namespace AddressProcessing.CSV
 		[Flags]
 		public enum Mode { Read = 1, Write = 2 };
 
-		[Obsolete("This constructor is obsolete. Use constructors with parameters in 'using()'")]
+		[Obsolete("This constructor is obsolete. Use constructors with parameters in using()")]
 		public CSVReaderWriter()
 		{			
 		}
 
 		public CSVReaderWriter(string fileName, Mode mode)
 		{
-			fileName.ThrowIfNull("fileName");
+			fileName.ThrowIfNullOrEmpty("fileName");
 
 #pragma warning disable 618 // Obsolete warning
 			Open(fileName, mode);
@@ -56,10 +55,10 @@ namespace AddressProcessing.CSV
 			_writerStream = writerStream;
 		}
 		
-		[Obsolete("This method is obsolete. Use constructors with parameters in 'using()' instead")]
+		[Obsolete("This method is obsolete. Use constructors with parameters in using() instead")]
 		public void Open(string fileName, Mode mode)
-		{			
-			fileName.ThrowIfNull("fileName");
+		{
+			fileName.ThrowIfNullOrEmpty("fileName");
 			
 			switch (mode)
 			{
@@ -68,7 +67,7 @@ namespace AddressProcessing.CSV
 					if (_readerStream != null) 
 						_readerStream.Close();
 
-					_readerStream = new CsvReader(new StreamReader(fileName), DELIMETER_AS_TAB);
+					_readerStream = new CsvReader(fileName, DELIMETER_AS_TAB);
 					break;
 				}
 				case Mode.Write:
@@ -76,7 +75,7 @@ namespace AddressProcessing.CSV
 					if (_writerStream != null)
 						_writerStream.Close();
 
-					_writerStream = new CsvWriter(new StreamWriter(fileName), DELIMETER_AS_TAB);
+					_writerStream = new CsvWriter(fileName, DELIMETER_AS_TAB);
 					break;
 				}
 				default:
@@ -95,13 +94,15 @@ namespace AddressProcessing.CSV
 		}
 
 		[Obsolete("This method is obsolete. Use 'bool Read(out string[] columns)' instead")]
-		public bool Read(string column1 = null, string column2 = null)
+		public bool Read(string column1, string column2)
 		{
 			if (_readerStream == null)
 				throw new NullReferenceException("_readerStream");
 			
-			var columns = _readerStream.Read();			
-			return columns.Length == 0;
+			var columns = _readerStream.Read();
+
+			var isReadFailed = columns == null || columns.Length == 0;
+			return !isReadFailed;
 		}
 
 		[Obsolete("This method is obsolete. Use 'bool Read(out string[] columns)' instead")]
