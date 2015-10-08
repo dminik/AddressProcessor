@@ -15,7 +15,7 @@ namespace AddressProcessing.CSV
 	/// Может открывать новые потоки, закрывая старые. 
 	/// CSVReaderWriter will close any passed or created streams while disposing.
 	/// </summary>
-	public class CSVReaderWriter : IDisposable
+	public class CSVReaderWriter : ICSVReaderWriter
 	{
 		IReader _readerStream = null;
 		IWriter _writerStream = null;
@@ -28,14 +28,14 @@ namespace AddressProcessing.CSV
 		[Flags]
 		public enum Mode { Read = 1, Write = 2 };
 
-		[Obsolete("This constructor is obsolete.  with parameters in 'using()'")]
+		[Obsolete("This constructor is obsolete. Use constructors with parameters in 'using()'")]
 		public CSVReaderWriter()
 		{			
 		}
 
 		public CSVReaderWriter(string fileName, Mode mode)
 		{
-#pragma warning disable 618
+#pragma warning disable 618 // Obsolete warning
 			Open(fileName, mode);
 #pragma warning restore 618
 		}
@@ -89,7 +89,7 @@ namespace AddressProcessing.CSV
 		}
 
 		[Obsolete("This method is obsolete. Use 'bool Read(out string[] columns)' instead")]
-		public bool Read(string reservedParam1 = null, string reservedParam2 = null)
+		public bool Read(string column1 = null, string column2 = null)
 		{			
 			var columns = _readerStream.Read();			
 			return columns.Length == 0;
