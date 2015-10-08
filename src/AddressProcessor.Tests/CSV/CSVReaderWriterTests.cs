@@ -15,7 +15,7 @@ namespace AddressProcessing.Tests.CSV
 	[TestFixture]
 	public class CSVReaderWriterTests
 	{
-		private const string _testInputFile = @"test_data\contacts.csv";
+		private const string _testInputFile = @"test_data\contacts.csv";		
 
 		#region ctor
 			
@@ -39,7 +39,7 @@ namespace AddressProcessing.Tests.CSV
 			using (var readerWriterUnderTest = new CSVReaderWriter(mockReader.Object))
 			{
 				// Act				
-#pragma warning disable 618
+#pragma warning disable 618 // obsolete warning
 				readerWriterUnderTest.Open(_testInputFile, CSVReaderWriter.Mode.Read);
 #pragma warning restore 618
 
@@ -56,7 +56,7 @@ namespace AddressProcessing.Tests.CSV
 			using (var writerUnderTest = new CSVReaderWriter(mockWriter.Object))
 			{
 				// Act				
-#pragma warning disable 618
+#pragma warning disable 618 // obsolete warning
 				writerUnderTest.Open(_testInputFile, CSVReaderWriter.Mode.Write);
 #pragma warning restore 618
 
@@ -70,7 +70,7 @@ namespace AddressProcessing.Tests.CSV
 		#region Read/Write
 
 		[Test]		
-		public void Read_UslessParamsPassed_ReturnSuccessAndNotSuccess()
+		public void Read_UselessParamsPassed_ReturnSuccessAndNotSuccess()
 		{
 			// Arrange	
 			var columnsInLines = new List<string[]>
@@ -84,7 +84,7 @@ namespace AddressProcessing.Tests.CSV
 				// Act
 				var column1 = string.Empty;
 				var column2 = string.Empty;
-#pragma warning disable 618
+#pragma warning disable 618 // obsolete warning
 				var isReadSuccess = readerWriterUnderTest.Read(column1, column2);
 				Assert.IsTrue(isReadSuccess);				
 				isReadSuccess = readerWriterUnderTest.Read(column1, column2);
@@ -110,10 +110,87 @@ namespace AddressProcessing.Tests.CSV
 			// Act
 			var column1 = string.Empty;
 			var column2 = string.Empty;
-#pragma warning disable 618
+#pragma warning disable 618 // obsolete warning
 			readerWriterUnderTest.Read(column1, column2);				
 #pragma warning restore 618
 			
+		}
+
+		[Test]		
+		public void Write_WriteLine_Success()
+		{
+			// Arrange				
+			var mockWriter = new Mock<IWriter>();
+			using (var readerWriterUnderTest = new CSVReaderWriter(mockWriter.Object))
+			{
+				// Act
+				string[] columns = { "1", "2" };
+				readerWriterUnderTest.Write(columns);				
+			}
+
+			// Assert 				
+			mockWriter.Verify(writer => writer.Write(It.IsAny<string[]>()), Times.Once);
+		}
+
+		[Test]
+		public void ReadWrite_OpenRealFilesForReadAndWriteForOneInstance_Success()
+		{
+			// Arrange				
+			var mockWriter = new Mock<IWriter>();
+#pragma warning disable 618 // obsolete warning 
+			using (var readerWriterUnderTest = new CSVReaderWriter(mockWriter.Object))
+
+			{
+				// Act
+
+				// writing
+				string[] columns = { "1", "2" };
+				readerWriterUnderTest.Write(columns);
+
+				// reading
+				readerWriterUnderTest.Open(_testInputFile, CSVReaderWriter.Mode.Read);
+				var isReadSuccess = readerWriterUnderTest.Read(out columns);
+
+				// Assert
+				mockWriter.Verify(writer => writer.Write(It.IsAny<string[]>()), Times.Once);
+				Assert.IsTrue(isReadSuccess);
+			}
+
+#pragma warning restore 618			 							
+		}
+
+		[Test]
+		public void Read_ReadLines_Success()
+		{
+			// Arrange	
+			var columnsInLines = new List<string[]>
+			{				 
+				new [] {"123", "456", },				
+				new [] {"789", "101", },	
+			};
+
+			var mockReader = CreateMockReader(columnsInLines);
+			using (var readerWriterUnderTest = new CSVReaderWriter(mockReader.Object))
+			{
+				// Act
+				string[] columns;
+				
+				var isReadSuccess = readerWriterUnderTest.Read(out columns);
+				Assert.IsTrue(isReadSuccess);
+				Assert.AreEqual(2, columns.Length);
+				Assert.AreEqual("123", columns[0]);
+				Assert.AreEqual("456", columns[1]);
+
+				isReadSuccess = readerWriterUnderTest.Read(out columns);
+				Assert.IsTrue(isReadSuccess);
+				Assert.AreEqual(2, columns.Length);
+				Assert.AreEqual("789", columns[0]);
+				Assert.AreEqual("101", columns[1]);
+
+				isReadSuccess = readerWriterUnderTest.Read(out columns);
+				Assert.IsFalse(isReadSuccess);
+				Assert.IsNull(columns);
+			}
 		}
 
 		#endregion
@@ -175,7 +252,6 @@ namespace AddressProcessing.Tests.CSV
 			{
 				// Act
 				string[] columns = { "1", "2" };
-				readerWriterUnderTest.Write(columns);
 				readerWriterUnderTest.Dispose();
 				readerWriterUnderTest.Write(columns);
 			}
@@ -200,7 +276,36 @@ namespace AddressProcessing.Tests.CSV
 
 			mockReader.Setup(x => x.Read()).Returns(linesQueue.Dequeue);
 			return mockReader;
-		} 
+		}
+
+		[Test]
+		public void CreateMockReader_ReadLines_Success()
+		{
+			// Arrange	
+			var columnsInLines = new List<string[]> { new[] { "123", "456", }, new[] { "789", "101", }, };
+			
+			using (var mockReader = CreateMockReader(columnsInLines).Object)
+			{				
+				string[] columns;
+
+				columns = mockReader.Read();
+				Assert.NotNull(columns);
+				Assert.AreEqual(2, columns.Length);
+				Assert.AreEqual("123", columns[0]);
+				Assert.AreEqual("456", columns[1]);
+
+				columns = mockReader.Read();
+				Assert.NotNull(columns);
+				Assert.AreEqual(2, columns.Length);
+				Assert.AreEqual("789", columns[0]);
+				Assert.AreEqual("101", columns[1]);
+
+				columns = mockReader.Read();
+				Assert.IsNull(columns);
+			}
+		}
+
+
 		#endregion
 	}
 }

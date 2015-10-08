@@ -5,22 +5,18 @@ namespace Helpers.Common
 {
 	public static class Extensions
 	{
-		public static T ThrowIfNull<T>(this T argument, string argumentName = "")
+		public static void ThrowIfNull<T>(this T argument, string argumentName = "")
 		{
 			if (argument == null)
 				throw new ArgumentNullException(argumentName);
-
-			return argument;
 		}
 
-		public static string ThrowIfNullOrEmpty(this string argument, string argumentName = "")
+		public static void ThrowIfNullOrEmpty(this string argument, string argumentName = "")
 		{
 			if (argument == null)
 				throw new ArgumentNullException(argumentName);
 			if (argument == string.Empty)
 				throw new ArgumentException(argumentName);
-
-			return argument;
 		}
 
 		public static StreamReader ToStream(this string s)
