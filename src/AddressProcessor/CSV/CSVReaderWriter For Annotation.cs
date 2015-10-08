@@ -7,7 +7,7 @@ namespace AddressProcessing.CSV
 	// Need interface. It will helpful for dependency injection and mocking in unit tests.	
 	// Implement interface IDisposable
 	// Better to use two different  classes to write and to read. It is a ‘Single responsibility principle’.
-	// We have the "interface" of ReaderWriter already in a production and can not to rollback it. 
+	// We have the "interface" of ReaderWriter already in a production (in not modificable class AddressFileProcessor and others??) and can not to rollback it. 
 	// Let's try to use it like fasade for your new classes CSVReader and CSVWriter. You should implement them and its interfaces (IReader and IWriter).
     public class CSVReaderWriterForAnnotation
     {
