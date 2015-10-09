@@ -23,7 +23,7 @@ namespace DataProviders.CSV
 			Delimiter = delimiter;
 
 			if (encoding == null)
-				encoding = Encoding.UTF8;
+				encoding = Encoding.ASCII;
 
 			Reader = new StreamReader(fileName, encoding);
 		}

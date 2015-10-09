@@ -21,7 +21,7 @@ namespace DataProviders.CSV
 			Delimiter = delimiter;
 
 			if (encoding == null)
-				encoding = Encoding.UTF8;
+				encoding = Encoding.ASCII;
 
 			Writer = new StreamWriter(fileName, append, encoding);
 		}

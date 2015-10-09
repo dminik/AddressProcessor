@@ -70,6 +70,8 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="test_data\contacts2.csv" />
+    <None Include="test_data\contacts3.csv" />
     <None Include="test_data\contacts.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

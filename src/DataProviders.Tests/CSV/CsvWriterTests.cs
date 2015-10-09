@@ -26,7 +26,7 @@ namespace DataProviders.Tests.CSV
 			try
 			{
 				// Act
-				using (var writer = new CsvWriter(fileName, DELIMETER_AS_SPACE))
+				using (var writer = new CsvWriter(fileName, DELIMETER_AS_SPACE, false, Encoding.ASCII))
 				{
 					string[] values1 = { "qw", "er" };
 					writer.Write(values1);
@@ -60,7 +60,7 @@ namespace DataProviders.Tests.CSV
 			try
 			{
 				// Act
-				using (var writer = new CsvWriter(fileName, DELIMETER_AS_SPACE))
+				using (var writer = new CsvWriter(fileName: fileName, delimiter: DELIMETER_AS_SPACE, append: false, encoding: Encoding.UTF8))
 				{
 					string[] values1 = { "è", "€" };
 					writer.Write(values1);

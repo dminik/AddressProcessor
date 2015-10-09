@@ -29,7 +29,7 @@ namespace AddressProcessing.CSV
 		{			
 		}
 
-		public CSVReaderWriter(string fileName, Mode mode, char delimiter = DELIMETER_AS_TAB, bool append = true, Encoding encoding = null)
+		public CSVReaderWriter(string fileName, Mode mode, char delimiter = '\t', bool append = false, Encoding encoding = null)
 		{			
 			fileName.ThrowIfNullOrEmpty("fileName");
 
@@ -55,7 +55,7 @@ namespace AddressProcessing.CSV
 		[Obsolete("This method is obsolete. Use constructors with parameters in using() instead")]
 		public void Open(string fileName, Mode mode)
 		{
-			Open_Internal(fileName, mode, DELIMETER_AS_TAB, false, Encoding.UTF8);
+			Open_Internal(fileName, mode, DELIMETER_AS_TAB, false, Encoding.ASCII);
 		}
 
 		protected void Open_Internal(string fileName, Mode mode, char delimiter, bool append, Encoding encoding)

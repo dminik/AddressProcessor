@@ -15,14 +15,15 @@ namespace AddressProcessing.Tests.CSV
 	[TestFixture]
 	public class CSVReaderWriterTests
 	{
-		private const string _testInputFile = @"test_data\contacts.csv";		
+		private const string _testInputFile3 = @"..\..\test_data\contacts3.csv";
+		private const string _testInputFile2 = @"..\..\test_data\contacts2.csv";		
 
 		#region ctor
 			
 		[Test]
 		public void ctorWithFileName_Open_Success()
 		{			
-			using (new CSVReaderWriter(_testInputFile, CSVReaderWriter.Mode.Read))
+			using (new CSVReaderWriter(_testInputFile3, CSVReaderWriter.Mode.Read))
 			{				
 			}
 		}
@@ -40,7 +41,7 @@ namespace AddressProcessing.Tests.CSV
 			{
 				// Act				
 #pragma warning disable 618 // obsolete warning
-				readerWriterUnderTest.Open(_testInputFile, CSVReaderWriter.Mode.Read);
+				readerWriterUnderTest.Open(_testInputFile3, CSVReaderWriter.Mode.Read);
 #pragma warning restore 618
 
 				// Assert 				
@@ -57,7 +58,7 @@ namespace AddressProcessing.Tests.CSV
 			{
 				// Act				
 #pragma warning disable 618 // obsolete warning
-				writerUnderTest.Open(_testInputFile, CSVReaderWriter.Mode.Write);
+				writerUnderTest.Open(_testInputFile3, CSVReaderWriter.Mode.Write);
 #pragma warning restore 618
 
 				// Assert 				
@@ -148,7 +149,7 @@ namespace AddressProcessing.Tests.CSV
 				readerWriterUnderTest.Write(columns);
 
 				// reading
-				readerWriterUnderTest.Open(_testInputFile, CSVReaderWriter.Mode.Read);
+				readerWriterUnderTest.Open(_testInputFile2, CSVReaderWriter.Mode.Read);
 				var isReadSuccess = readerWriterUnderTest.Read(out columns);
 
 				// Assert
@@ -157,6 +158,30 @@ namespace AddressProcessing.Tests.CSV
 			}
 
 #pragma warning restore 618			 							
+		}
+
+		//[Test]
+		public void Read_OpenRealFile_Success()
+		{
+			// Arrange				
+			
+#pragma warning disable 618 // obsolete warning
+			using (var readerWriterUnderTest = new CSVReaderWriter())
+			{
+				// Act
+
+				
+				// reading
+				readerWriterUnderTest.Open(_testInputFile3, CSVReaderWriter.Mode.Read);
+				string[] columns;
+				var isReadSuccess = readerWriterUnderTest.Read(out columns);
+
+				// Assert
+				
+				Assert.IsTrue(isReadSuccess);
+			}
+
+#pragma warning restore 618
 		}
 
 		[Test]
