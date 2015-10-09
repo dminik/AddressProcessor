@@ -23,6 +23,19 @@ namespace Helpers.Common.Tests
 		}
 
 		[Test]
+		[ExpectedException(typeof(ArgumentException))]
+		public void ThrowIfNullOrEmpty_SetEmpty_ThrowException()
+		{
+			string.Empty.ThrowIfNullOrEmpty("obj");
+		}
+
+		[Test]
+		public void ThrowIfNullOrEmpty_SetNotEmpty_Success()
+		{			
+			"foo".ThrowIfNullOrEmpty("obj");
+		}
+
+		[Test]
 		public void ToStream_PutString_SuccessfullyReadStringFromStream()
 		{
 			string str = "1a\n2b";

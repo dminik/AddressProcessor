@@ -160,7 +160,7 @@ namespace AddressProcessing.Tests.CSV
 #pragma warning restore 618			 							
 		}
 
-		//[Test]
+		[Test]
 		public void Read_OpenRealFile_Success()
 		{
 			// Arrange				

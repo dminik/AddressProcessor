@@ -13,8 +13,8 @@ namespace Helpers.Common
 
 		public static void ThrowIfNullOrEmpty(this string argument, string argumentName = "")
 		{
-			if (argument == null)
-				throw new ArgumentNullException(argumentName);
+			argument.ThrowIfNull("argumentName");
+
 			if (argument == string.Empty)
 				throw new ArgumentException(argumentName);
 		}
