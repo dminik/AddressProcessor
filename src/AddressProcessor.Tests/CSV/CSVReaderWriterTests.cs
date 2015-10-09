@@ -15,15 +15,15 @@ namespace AddressProcessing.Tests.CSV
 	[TestFixture]
 	public class CSVReaderWriterTests
 	{
-		private const string _testInputFile3 = @"..\..\test_data\contacts3.csv";
-		private const string _testInputFile2 = @"..\..\test_data\contacts2.csv";		
+		private const string _testFileForWrite = @"..\..\test_data\contacts3.csv";
+		private const string _testFileForRead = @"..\..\test_data\contacts2.csv";		
 
 		#region ctor
 			
 		[Test]
 		public void ctorWithFileName_Open_Success()
 		{			
-			using (new CSVReaderWriter(_testInputFile3, CSVReaderWriter.Mode.Read))
+			using (new CSVReaderWriter(_testFileForRead, CSVReaderWriter.Mode.Read))
 			{				
 			}
 		}
@@ -41,7 +41,7 @@ namespace AddressProcessing.Tests.CSV
 			{
 				// Act				
 #pragma warning disable 618 // obsolete warning
-				readerWriterUnderTest.Open(_testInputFile3, CSVReaderWriter.Mode.Read);
+				readerWriterUnderTest.Open(_testFileForRead, CSVReaderWriter.Mode.Read);
 #pragma warning restore 618
 
 				// Assert 				
@@ -58,7 +58,7 @@ namespace AddressProcessing.Tests.CSV
 			{
 				// Act				
 #pragma warning disable 618 // obsolete warning
-				writerUnderTest.Open(_testInputFile3, CSVReaderWriter.Mode.Write);
+				writerUnderTest.Open(_testFileForWrite, CSVReaderWriter.Mode.Write);
 #pragma warning restore 618
 
 				// Assert 				
@@ -149,7 +149,7 @@ namespace AddressProcessing.Tests.CSV
 				readerWriterUnderTest.Write(columns);
 
 				// reading
-				readerWriterUnderTest.Open(_testInputFile2, CSVReaderWriter.Mode.Read);
+				readerWriterUnderTest.Open(_testFileForRead, CSVReaderWriter.Mode.Read);
 				var isReadSuccess = readerWriterUnderTest.Read(out columns);
 
 				// Assert
@@ -172,7 +172,7 @@ namespace AddressProcessing.Tests.CSV
 
 				
 				// reading
-				readerWriterUnderTest.Open(_testInputFile3, CSVReaderWriter.Mode.Read);
+				readerWriterUnderTest.Open(_testFileForRead, CSVReaderWriter.Mode.Read);
 				string[] columns;
 				var isReadSuccess = readerWriterUnderTest.Read(out columns);
 
