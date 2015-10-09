@@ -22,10 +22,12 @@ namespace AddressProcessing.Tests.CSV
 			
 		[Test]
 		public void ctorWithFileName_Open_Success()
-		{			
+		{
+#pragma warning disable 618 // obsolete warning
 			using (new CSVReaderWriter(_testFileForRead, CSVReaderWriter.Mode.Read))
-			{				
+			{
 			}
+#pragma warning restore 618
 		}
 
 		#endregion
@@ -37,10 +39,10 @@ namespace AddressProcessing.Tests.CSV
 		{
 			// Arrange	
 			var mockReader = new Mock<IReader>();
+#pragma warning disable 618 // obsolete warning
 			using (var readerWriterUnderTest = new CSVReaderWriter(mockReader.Object))
 			{
 				// Act				
-#pragma warning disable 618 // obsolete warning
 				readerWriterUnderTest.Open(_testFileForRead, CSVReaderWriter.Mode.Read);
 #pragma warning restore 618
 
@@ -54,10 +56,11 @@ namespace AddressProcessing.Tests.CSV
 		{
 			// Arrange	
 			var mockWriter = new Mock<IWriter>();
+#pragma warning disable 618 // obsolete warning
 			using (var writerUnderTest = new CSVReaderWriter(mockWriter.Object))
 			{
 				// Act				
-#pragma warning disable 618 // obsolete warning
+
 				writerUnderTest.Open(_testFileForWrite, CSVReaderWriter.Mode.Write);
 #pragma warning restore 618
 
@@ -80,12 +83,13 @@ namespace AddressProcessing.Tests.CSV
 			};
 
 			var mockReader = CreateMockReader(columnsInLines);
+#pragma warning disable 618 // obsolete warning
 			using (var readerWriterUnderTest = new CSVReaderWriter(mockReader.Object))
 			{
 				// Act
 				var column1 = string.Empty;
 				var column2 = string.Empty;
-#pragma warning disable 618 // obsolete warning
+
 				var isReadSuccess = readerWriterUnderTest.Read(column1, column2);
 				Assert.IsTrue(isReadSuccess);				
 				isReadSuccess = readerWriterUnderTest.Read(column1, column2);
@@ -105,7 +109,9 @@ namespace AddressProcessing.Tests.CSV
 			};
 
 			var mockReader = CreateMockReader(columnsInLines);
+#pragma warning disable 618 // obsolete warning
 			var readerWriterUnderTest = new CSVReaderWriter(mockReader.Object);
+#pragma warning restore 618
 			readerWriterUnderTest.Close();
 
 			// Act
