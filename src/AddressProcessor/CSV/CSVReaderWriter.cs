@@ -11,13 +11,14 @@ using Helpers.Common;
 namespace AddressProcessing.CSV
 {
 	/// <summary>	
+	/// CSVReaderWriter could read and write CSV files and streams.
 	/// CSVReaderWriter will close any passed or opened streams while disposing.
 	/// </summary>
+	[Obsolete("This class is obsolete. Use CsvReader and CsvWriter instead.")]
 	public class CSVReaderWriter : ICSVReaderWriter
 	{
 		const char DELIMETER_AS_TAB = '\t';		
 		
-
 		private IReader ReaderStream { get; set; }
 		private IWriter WriterStream { get; set; }
 
