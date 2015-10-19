@@ -2,7 +2,15 @@
 using System.IO;
 
 namespace AddressProcessing.CSV
-{ 
+{
+	// What I have done in the solution:
+	// Added DataProviders project and DataProviders.Tests
+	// Added Helpers.Common and Helpers.Common.Tests
+	// Added file CSVReaderWriterTests.cs with tests to AddressProcessing.Tests project
+	// Re-wrote CSVReaderWriter.cs to use new classes from DataProviders
+	// Added comments what is wrong.
+
+
 	// General notes after review:
 	//- May be it is good idea to have method for bulk insert for IMailShot.
 	//- Instead list of parameters use struct with fields.
@@ -11,12 +19,12 @@ namespace AddressProcessing.CSV
 	//- Prefer special exception insted some general exceptions with your messages. 
 	//- Defined classes should be open for extension, but closed for modification. So, use virtual, protected, private in a correct form.
 	//- Build solution with .sln. 
-	//- Also we could create class which could convert a column list to some struct and vice versa. Pipe line wil be like this:
+	//- Also we could create class which could convert a column list to some struct and vice versa. Pipe line will be like this:
 	//	1.Read from file
 	//	2.Convert to a struct
 	//	3.Send the struct with IMailShot method
 
-
+	
 	// TODO:
 	// Need interface. It will helpful for dependency injection and mocking in unit tests.	
 	// Implement interface IDisposable
